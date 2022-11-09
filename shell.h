@@ -16,4 +16,9 @@
 
 extern char **environ;
 
+#define clear() printf("\033[H\033[J")
+
+void init_shell();
+int prompt(void);
+
 #endif
