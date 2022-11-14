@@ -20,5 +20,6 @@ extern char **environ;
 
 void init_shell();
 int prompt(void);
+char *_read(void);
 
 #endif

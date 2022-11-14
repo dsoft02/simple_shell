@@ -10,8 +10,8 @@
 int main(void)
 {
 
-    char *pathbuffer = NULL; 
-    char *copy = NULL; 
+    char *pathbuffer = NULL;
+    char *copy = NULL;
     char *buffer = NULL;
     char *PATH = NULL;
     char **argv;
