@@ -22,4 +22,17 @@ void init_shell();
 int prompt(void);
 char *_read(void);
 
+
+/* basic functions */
+int _putchar(char c);
+void _puts(char *str);
+
+
+/* string functions */
+int _strcomp(const char *s1, const char *s2);
+int _strlen(char *s);
+char *_strcat(char *dest, char *src);
+int _countstring(char *str);
+char *_strdup(char *str);
+
 #endif
