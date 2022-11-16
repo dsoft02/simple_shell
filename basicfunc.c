@@ -75,4 +75,3 @@ int _env(void)
         _puts(environ[i]);
     return (0);
 }
-
