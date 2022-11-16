@@ -18,7 +18,7 @@ extern char **environ;
 
 #define clear() printf("\033[H\033[J")
 
-void init_shell();
+void init_shell(void);
 int prompt(void);
 char *_read(void);
 
@@ -34,5 +34,12 @@ int _strlen(char *s);
 char *_strcat(char *dest, char *src);
 int _countstring(char *str);
 char *_strdup(char *str);
+int _splitstring(char *str);
+
+char *_pathbuffer(char **av, char *PATH, char *copy);
+int checkbuiltins(char **av, char *buffer, int exitstatus);
+int _forkprocess(char **av, char *buffer, char *pathbuffer);
+
+
 
 #endif

@@ -2,16 +2,16 @@
 
 /**
  * init_shell - function to initialize the shell program
-*/
-void init_shell()
+ */
+void init_shell(void)
 {
-    clear();
-    printf("\n\n***********************************************");
-    printf("\n\n****SIMPLE SHELL BY DSOFT02 & MANLIKETEETOS****");
-    printf("\n\n***********************************************");
-    printf("\n");
-    sleep(1);
-    clear();
+	clear();
+	printf("\n\n***********************************************");
+	printf("\n\n****SIMPLE SHELL BY DSOFT02 & MANLIKETEETOS****");
+	printf("\n\n***********************************************");
+	printf("\n");
+	sleep(1);
+	clear();
 }
 
 /**
@@ -21,16 +21,16 @@ void init_shell()
  */
 int prompt(void)
 {
-    char *prompt = "$ ";
-    ssize_t linecount = 0;
+	char *prompt = "$ ";
+	ssize_t linecount = 0;
 
-    if (isatty(STDIN_FILENO) == 1)
-    {
-        linecount = write(STDOUT_FILENO, prompt, 2);
-        if (linecount == -1)
-            exit(0);
-    }
-    return (0);
+	if (isatty(STDIN_FILENO) == 1)
+	{
+		linecount = write(STDOUT_FILENO, prompt, 2);
+		if (linecount == -1)
+			exit(0);
+	}
+	return (0);
 }
 
 /**
@@ -40,28 +40,28 @@ int prompt(void)
  */
 char *_read(void)
 {
-    ssize_t readcount = 0;
-    size_t n = 0;
-    char *buffer = NULL;
-    int i = 0;
+	ssize_t readcount = 0;
+	size_t n = 0;
+	char *buffer = NULL;
+	int i = 0;
 
-    readcount = getline(&buffer, &n, stdin);
-    if (readcount == -1)
-    {
-        free(buffer);
-        if (isatty(STDIN_FILENO) != 0)
-            write(STDOUT_FILENO, "\n", 1);
-        exit(0);
-    }
-    if (buffer[readcount - 1] == '\n' || buffer[readcount - 1] == '\t')
-        buffer[readcount - 1] = '\0';
-    for (i = 0; buffer[i]; i++)
-    {
-        if (buffer[i] == '#' && buffer[i - 1] == ' ')
-        {
-            buffer[i] = '\0';
-            break;
-        }
-    }
-    return (buffer);
+	readcount = getline(&buffer, &n, stdin);
+	if (readcount == -1)
+	{
+		free(buffer);
+		if (isatty(STDIN_FILENO) != 0)
+			write(STDOUT_FILENO, "\n", 1);
+		exit(0);
+	}
+	if (buffer[readcount - 1] == '\n' || buffer[readcount - 1] == '\t')
+		buffer[readcount - 1] = '\0';
+	for (i = 0; buffer[i]; i++)
+	{
+		if (buffer[i] == '#' && buffer[i - 1] == ' ')
+		{
+			buffer[i] = '\0';
+			break;
+		}
+	}
+	return (buffer);
 }
