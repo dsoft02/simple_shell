@@ -49,5 +49,6 @@ char *_concat(char *tmp, char **av, char *tok);
 
 int checkbuiltins(char **av, char *buffer, int exitstatus);
 int _forkprocess(char **av, char *buffer, char *pathbuffer);
+char **_strtoken(char *buffer);
 
 #endif

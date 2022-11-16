@@ -1,10 +1,10 @@
 #include "shell.h"
 
 /**
-*_putchar - prints each character
-*@c : character
-*Return: return the write value
-*/
+ *_putchar - prints each character
+ *@c : character
+ *Return: return the write value
+ */
 
 int _putchar(char c)
 {
@@ -12,9 +12,9 @@ int _putchar(char c)
 }
 
 /**
-*_puts - prints a string
-*@str: string
-*/
+ *_puts - prints a string
+ *@str: string
+ */
 
 void _puts(char *str)
 {
@@ -34,11 +34,11 @@ void _puts(char *str)
  */
 char *_memset(char *s, char b, unsigned int n)
 {
-    unsigned int i;
+	unsigned int i;
 
-    for (i = 0; i < n; i++)
-        s[i] = b;
-    return (s);
+	for (i = 0; i < n; i++)
+		s[i] = b;
+	return (s);
 }
 
 /**
@@ -49,17 +49,17 @@ char *_memset(char *s, char b, unsigned int n)
  */
 char *_getenv(const char *name)
 {
-    int i, result;
+	int i, result;
 
-    for (i = 0; environ[i]; i++)
-    {
-        result = _strcmpPath(name, environ[i]);
-        if (result == 0)
-        {
-            return (environ[i]);
-        }
-    }
-    return (NULL);
+	for (i = 0; environ[i]; i++)
+	{
+		result = _strcmpPath(name, environ[i]);
+		if (result == 0)
+		{
+			return (environ[i]);
+		}
+	}
+	return (NULL);
 }
 
 /**
@@ -69,9 +69,9 @@ char *_getenv(const char *name)
  */
 int _env(void)
 {
-    int i;
+	int i;
 
-    for (i = 0; environ[i]; i++)
-        _puts(environ[i]);
-    return (0);
+	for (i = 0; environ[i]; i++)
+		_puts(environ[i]);
+	return (0);
 }
