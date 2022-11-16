@@ -1,174 +1,157 @@
 #include "shell.h"
-/**
- * _pathbuffer - finds the string to call execve on
- * @av: pointer to array of user of strings
- * @PATH: pointer to PATH string
- * @copy: pointer to copy of PATH string
- *
- * Return: a pointer to string to call execve on
- */
-char *_pathbuffer(char **av, char *PATH, char *copy)
-{
-	char *tok, *pathbuffer = NULL, *concatstr = NULL;
-	static char tmp[256];
-	int pathlen = 0, pathflag = 0, /*len = 0,*/ z = 0, toklen = 0;
-	struct stat h;
 
-	copy = NULL;
-	copy = _strdup(PATH);
-	pathlen = _splitPath(copy);
-	tok = strtok(copy, ": =");
-	while (tok != NULL)
+/**
+ * validagetline - executes command lines entered by pipe
+ * @buffer: program name
+ * @len: length buffer
+ * @args: Argument 1
+ * @env_args: Enviroment arguments
+ * Return: 0
+*/
+void validagetline(char *buffer, int len, char **args, char **env_args)
+{
+	if (len == EOF)
 	{
-		concatstr = _concat(tmp, av, tok);
-		if (stat(concatstr, &h) == 0)
+		printf("EOF\n");
+		write(STDOUT_FILENO, "\n", 1);
+		if (buffer != NULL)
 		{
-			pathbuffer = concatstr;
-			pathflag = 1;
-			break;
+			freedom(1, buffer);
+			buffer = NULL;
 		}
-		if (z < pathlen - 2)
+		if (args != NULL)
 		{
-			toklen = _strlen(tok);
-			if (tok[toklen + 1] == ':')
-			{
-				if (stat(av[0], &h) == 0)
-				{
-					pathbuffer = av[0];
-					pathflag = 1;
-					break;
-				}
-			}
+			freedom(2, args);
+			args = NULL;
 		}
-		z++;
-		tok = strtok(NULL, ":");
+		if (env_args != NULL)
+		{
+			freedom(2, env_args);
+			env_args = NULL;
+		}
+		exit(0);
 	}
-	if (pathflag == 0)
-		pathbuffer = av[0];
-	free(copy);
-	return (pathbuffer);
 }
 
 /**
- * _splitPath - counts the number of PATH members
- * @str: pointer to string to count
- *
- * Return: number of PATH members
- */
-int _splitPath(char *str)
+ * execo - Executes a given command
+ * @command: Given command
+ * @args: command arguments
+ * Return: Exit = 0 or Error Number
+*/
+int execo(char *command, char **args)
 {
-	int i;
-	int searchflag = 1;
-	int wordcount = 0;
+	int status;
+	pid_t pid;
+	int errcode = 0;
 
-	for (i = 0; str[i]; i++)
+	pid = fork();
+	if (!pid)
 	{
-		if (str[i] != ':' && searchflag == 1)
+		if (execve(command, args, environ) == -1)
 		{
-			wordcount += 1;
-			searchflag = 0;
+			freedom(1, command);
+			command = NULL;
+			errcode = errno;
+			error_msg(args);
+			exit(errcode);
 		}
-		if (str[i + 1] == ':')
+		else
 		{
-			searchflag = 1;
+			freedom(1, command);
+			command = NULL;
+			exit(errcode);
 		}
 	}
-	return (wordcount);
+	else
+		wait(&status);
+
+	freedom(1, command);
+	command = NULL;
+	errcode = 0;
+	return (errcode);
 }
 
-#include "shell.h"
+/**
+**find_builtins -  finds wheter user's command is a builtin
+** @user_input: user's command
+**Return: pointer to function builtin or NULL if doesn't exists
+**/
+int (*find_builtins(char *user_input))()
+{
+	int counter = 0, stru_size = 0;
+
+	builtin_struct our_builtins[] = {
+		{"exit", exit_func},
+		{"env", env_func},
+	};
+
+	stru_size = (sizeof(our_builtins) / sizeof(builtin_struct));
+	if (user_input != NULL)
+	{
+		while (counter < stru_size)
+		{
+			if (strcomp(our_builtins[counter].b_name, user_input) == 0)
+				return (our_builtins[counter].b_func);
+			counter++;
+		}
+	}
+	return (NULL);
+}
 
 /**
- * _strcmpPath - compares PATH with environ to find PATH value
- * @s1: pointer PATH string
- * @s2: pointer to environ string with actual value
- *
- * Return: 0 on success
- */
-int _strcmpPath(const char *s1, const char *s2)
+ * notty - executes command lines entered by pipe
+ * @av: program name
+ * Return: 0
+*/
+int notty(char **av __attribute__((unused)))
 {
-	int i;
+	size_t bufsize;
+	int len = 0;
+	char *buffer = NULL;
+	char **env_args = NULL;
+	char **user_command = NULL;
+	char *full_command = NULL;
+	int (*b_func)() = NULL;
 
-	for (i = 0; s2[i] != '='; i++)
+	while ((len = getline(&buffer, &bufsize, stdin)) > 0)
 	{
-		if (s1[i] != s2[i])
+		validagetline(buffer, len, user_command, env_args);
+		if (buffer[0] == 10 || buffer[0] == 9)
+			continue;
+		user_command = args_constructor(buffer);
+		if (user_command == NULL)
+			continue;
+		b_func = find_builtins(*user_command);
+		if (b_func)
+		{
+			if (b_func == exit_func)
+				free_all(user_command, env_args, buffer, NULL);
+			b_func();
+			free_all(user_command, NULL, NULL, NULL);
+			continue;
+		}
+		env_args = getenvpath();
+		if (env_args == NULL)
 			return (-1);
+		full_command = _include_path(user_command, env_args);
+		if (full_command == NULL)
+			write(STDOUT_FILENO, "command NOT found\n", 18);
+		else
+			execo(full_command, user_command);
+		freedom(1, buffer), buffer = NULL;
+		freedom(2, user_command), user_command = NULL;
+		freedom(2, env_args), env_args  = NULL;
 	}
+	freedom(1, buffer), buffer = NULL;
 	return (0);
 }
 
 /**
- * checkbuiltins - check if first user string is a built-in
- * @av: pointer to array of user of strings
- * @buffer: pointer to user string
- * @exitstatus: exit status of execve
- * Return: 1 if user string is equal to env or 0 otherwise
- */
-int checkbuiltins(char **av, char *buffer, int exitstatus)
+ * exit_func - Builtin function that exits from shell
+ * Return: 0
+*/
+int exit_func(void)
 {
-	int i;
-
-	if (_strcomp(av[0], "env") == 0)
-	{
-		_env();
-		for (i = 0; av[i]; i++)
-			free(av[i]);
-		free(av);
-		free(buffer);
-		return (1);
-	}
-	else if (_strcomp(av[0], "exit") == 0)
-	{
-		for (i = 0; av[i]; i++)
-			free(av[i]);
-		free(av);
-		free(buffer);
-		exit(exitstatus);
-	}
-	else
-		return (0);
-}
-
-/**
- * _forkprocess - create child process to execute based on user input
- * @av: pointer to array of user of strings
- * @buffer: pointer to user string
- * @pathbuffer: pointer to user input
- *
- * Return: 0 on success
- */
-int _forkprocess(char **av, char *buffer, char *pathbuffer)
-{
-	int i, status, result, exitstatus = 0;
-	pid_t pid;
-
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("Error");
-		exit(1);
-	}
-	if (pid == 0)
-	{
-		result = execve(pathbuffer, av, environ);
-		if (result == -1)
-		{
-			perror(av[0]);
-			for (i = 0; av[i]; i++)
-				free(av[i]);
-			free(av);
-			free(buffer);
-			exit(127);
-		}
-	}
-	wait(&status);
-	if (WIFEXITED(status))
-	{
-		exitstatus = WEXITSTATUS(status);
-	}
-	for (i = 0; av[i]; i++)
-		free(av[i]);
-	free(av);
-	free(buffer);
-	return (exitstatus);
+	exit(0);
 }

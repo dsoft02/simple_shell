@@ -1,107 +1,117 @@
 #include "shell.h"
-
 /**
- * _strcomp - compares two strings
- * @s1: char
- * @s2: char
- * Return: integer value
+ * lennum - length of number
+ * @n: int
+ * Return: length
  */
-int _strcomp(const char *s1, const char *s2)
+int lennum(int n)
 {
-	while ((*s1 != '\0' && *s2 != '\0') && *s1 == *s2)
+	int len = 0;
+
+	while (n / 10 != 0)
 	{
-		s1++;
-		s2++;
+		len++;
+		n /= 10;
 	}
-	if (*s1 == *s2)
-		return (0);
-	else
-		return (*s1 - *s2);
+	return (len);
 }
 
 /**
- * _strlen - returns the length of a string
- * @s: character
- * i - integer
- * Return: integer value of lenght
+ * int_to_char - take an int and convert to string
+ * @num: integer to be printed
+ * Return: string
  */
-int _strlen(char *s)
-{
-	int i;
 
-	for (i = 0; s[i]; i++)
-		;
-	return (i);
+char *int_to_char(int num)
+{
+	int digit = 0;
+	int i = 0;
+	char *str;
+	int divisor = 1000000000;
+	int len = lennum(num);
+
+	str = malloc(len * sizeof(char) + 1);
+	if (!str)
+		return (NULL);
+
+	if (num < 10)
+	{
+		str[i++] = num + '0';
+		str[i] = '\0';
+		return (str);
+	}
+
+	while (divisor)
+	{
+		digit = (num / divisor) % 10;
+		if (digit != 0 || (len >= 0 && str[i - 1] >= '0'))
+		{
+			str[i] = digit + '0';
+			i++;
+			len--;
+		}
+		divisor /= 10;
+	}
+	str[i] = '\0';
+	return (str);
 }
 
 /**
- * _strcat - concatenates two strings
- * @dest: final char
- * @src: source char
- * i - integer
- * j - integer
- * Return: concatenated character
+ * _strcpy - unction that copies the string pointed to by src
+ *@dest: char
+ *@src:_ char
+ * Return: dest
  */
-char *_strcat(char *dest, char *src)
+char *_strcpy(char *dest, char *src)
 {
-	int i;
-	int j;
+	int i = 0, j;
 
-	for (i = 0; dest[i] != '\0'; i++)
-		;
-	for (j = 0; src[j] != '\0'; j++, i++)
-		dest[i] = src[j];
-	dest[i] = '\0';
+	while (src[i] != '\0')
+	{
+		i++;
+	}
+	for (j = 0; j <= i; j++)
+	{
+		dest[j] = src[j];
+	}
 	return (dest);
 }
 
 /**
- * _countstring - counts number of words in string
- * @str: pointer to string
- *
- * Return: number of words in string
- */
-int _countstring(char *str)
+ * _compare - compares two strings at a given position
+ * @x: string to be compared
+ * @y: string to compare
+ * Return: Nohing
+*/
+int _compare(char *x, char *y)
 {
-	int i;
-	int flag = 1;
-	int count = 0;
-
-	for (i = 0; str[i]; i++)
+	while (*x && *y)
 	{
-		if (str[i] != ' ' && flag == 1)
-		{
-			count += 1;
-			flag = 0;
-		}
-		if (str[i + 1] == ' ')
-			flag = 1;
+		if (*x != *y)
+			return (0);
+
+		x++;
+		y++;
 	}
-	return (count);
+
+	return (*y == '\0');
 }
 
 /**
- * _strdup - duplicates a string
- * @str: pointer to string to duplicate
- *
- * Return: pointer to duplicated string
- */
-char *_strdup(char *str)
+ * _strstr - compares two strings at a given position
+ * @x: string to be compared
+ * @y: string to compare
+ * Return: pointer to the first occurence
+*/
+char *_strstr(char *x, char *y)
 {
-	int i;
-	char *dest_str;
-
-	if (str == NULL)
-		return (NULL);
-	for (i = 0; str[i] != '\0'; i++)
-		;
-	dest_str = malloc(sizeof(char) * (i + 1));
-	if (dest_str == NULL)
-		return (NULL);
-	for (i = 0; str[i] != '\0'; i++)
+	while (*x != '\0')
 	{
-		dest_str[i] = str[i];
+		if ((*x == *y) && _compare(x, y))
+			return (x);
+		x++;
 	}
-	dest_str[i] = '\0';
-	return (dest_str);
+
+	return (NULL);
 }
+

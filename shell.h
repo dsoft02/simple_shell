@@ -1,54 +1,67 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <sys/time.h>
-
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <stdarg.h>
 extern char **environ;
-
-#define clear() printf("\033[H\033[J")
-
-void init_shell(void);
-int prompt(void);
-char *_read(void);
-
-/* program logic */
-
-int checkbuiltins(char **av, char *buffer, int exitstatus);
-int _forkprocess(char **av, char *buffer, char *pathbuffer);
-char **_strtoken(char *buffer);
-
-
-/* basic functions */
-int _putchar(char c);
-void _puts(char *str);
-char *_memset(char *s, char b, unsigned int n);
-char *_getenv(const char *name);
-int _env(void);
-
-
-/* string functions */
-int _strcomp(const char *s1, const char *s2);
-int _strlen(char *s);
+/**
+* struct builtin - struct that contains the builtin commands
+* @b_name: name of the command
+* @b_func: pointer to a function
+*/
+typedef struct builtin
+{
+	char *b_name;
+	int (*b_func)();
+} builtin_struct;
+int loop;
+char *shell_home;
+int errcode;
+char *ptr_dup;
+int (*find_builtins(char *user_input))();
+int exit_func(void);
+int env_func(void);
+void change_equal_sig(char *str);
+char *_getpath();
+void error_msg(char **args);
+char **get_path(char *args);
+char *_include_path(char **args, char **path);
+char **getenvpath(void);
+void freedom(int n, ...);
+int non_interactive_mode(char **av);
+int _interactive(char **av __attribute__((unused)));
+int countCommands(char *buffer);
+char **parsing(char *buffer, int characters);
+int execo(char *command, char **args);
+void free_all(char **dptr1, char **dptr2, char *sptr1, char *sptr2);
+void logo(void);
+int strncomp(char *s1, char *s2, size_t n);
+int strlarge(char *s);
+char *strduplicate(char *s);
+int strcomp(char *s1, char *s2);
+char *strconk(char *dest, char *src);
+int split_dir(char *buffer);
+int lennum(int n);
+char *int_to_char(int num);
 char *_strcat(char *dest, char *src);
-int _countstring(char *str);
-char *_strdup(char *str);
-int _splitstring(char *str);
+char *_strdup(char *s);
+char *_itoa(int num);
+char *_strstr(char *x, char *y);
+int _compare(char *x, char *y);
+int _strlen(char *s);
+int _strcmp(char *s1, char *s2);
+int _strncmp(char *s1, char *s2, size_t n);
+char *_strcpy(char *dest, char *src);
 
-/* Path functions */
-char *_pathbuffer(char **av, char *PATH, char *copy);
-int _splitPath(char *str);
-int _strcmpPath(const char *s1, const char *s2);
-char *_concat(char *tmp, char **av, char *tok);
-
-
-
+void error_badcommand(char **args, char *buffer);
+char **args_constructor(char *buffer);
+void validagetline(char *buffer, int len, char **args, char **env_args);
+int notty(char **av __attribute__((unused)));
 #endif

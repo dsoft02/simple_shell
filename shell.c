@@ -1,48 +1,30 @@
 #include "shell.h"
-
 /**
- *main - Brain box for shell project
- *
- *
- *Return:  return 0 (success)
- */
+ * main - Shell entry point
+ * @argc: Argument counter
+ * @argv: Argument values
+ * Return: Exit if success = 0
+*/
 
-int main(void)
+int main(int argc __attribute__((unused)), char **argv __attribute__((unused)))
 {
 
-	char *pathbuffer = NULL;
-	char *copy = NULL;
-	char *buffer = NULL;
-	char *PATH = NULL;
-	char **argv;
-	int exitstatus = 0;
+	int int_mode = 1;
+	int errcode = 0;
 
-	/* init_shell(); */
-	signal(SIGINT, SIG_IGN);
-	PATH = _getenv("PATH");
-	if (PATH == NULL)
-		return (-1);
-	while (1)
+	loop = 1;
+	shell_home = argv[0];
+	errcode = errcode + 0;
+
+	int_mode = isatty(STDIN_FILENO);
+	if (int_mode == 0)
 	{
-		argv = NULL;
-		prompt();
-		buffer = _read();
-		if (*buffer != '\0')
-		{
-			argv = _strtoken(buffer);
-			if (argv == NULL)
-			{
-				free(buffer);
-				continue;
-			}
-			pathbuffer = _pathbuffer(argv, PATH, copy);
-			if (checkbuiltins(argv, buffer, exitstatus) == 1)
-				continue;
-			exitstatus = _forkprocess(argv, buffer, pathbuffer);
-		}
-		else
-			free(buffer);
+		notty(argv);
 	}
+	else
+	{
 
+		_interactive(argv);
+	}
 	return (0);
 }

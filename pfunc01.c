@@ -1,118 +1,122 @@
 #include "shell.h"
-
 /**
- * init_shell - function to initialize the shell program
- */
-void init_shell(void)
+ * args_constructor - executes command lines entered by pipe
+ * @buffer: command name
+ * Return: 0
+*/
+char **args_constructor(char *buffer)
 {
-	clear();
-	printf("\n\n***********************************************");
-	printf("\n\n****SIMPLE SHELL BY DSOFT02 & MANLIKETEETOS****");
-	printf("\n\n***********************************************");
-	printf("\n");
-	sleep(1);
-	clear();
+	int size = 0;
+	char **user_command = NULL;
+
+	size = countCommands(buffer);
+	user_command = parsing(buffer, size);
+	if (user_command == NULL)
+	{
+		freedom(2, user_command);
+		user_command = NULL;
+	}
+
+	return (user_command);
 }
 
 /**
- * prompt - function that write a prompt
- *
- * Return: 0 on sucess
- */
-int prompt(void)
+ * env_func - Prints eviroment variables
+ * Return: 0 on success
+*/
+int env_func(void)
 {
-	char *prompt = "$ ";
-	ssize_t linecount = 0;
+	int counter = 0, lenght = 0;
 
-	if (isatty(STDIN_FILENO) == 1)
+	while (environ[counter] != NULL)
 	{
-		linecount = write(STDOUT_FILENO, prompt, 2);
-		if (linecount == -1)
-			exit(0);
+		lenght = strlarge(environ[counter]);
+		write(STDOUT_FILENO, environ[counter], lenght);
+		write(STDOUT_FILENO, "\n", 1);
+		counter++;
 	}
 	return (0);
 }
 
 /**
- * _read - reads stdin and stores it in a buffer
- *
- * Return: a pointer to the buffer
- */
-char *_read(void)
+* free_env - frees tokenized PATH directories and user's arguments
+* @env_args: tokenized environment directories
+* @args: tokenized user's commands
+* Return: nothing
+*/
+
+void free_env(char **env_args, char **args)
 {
-	ssize_t readcount = 0;
-	size_t n = 0;
-	char *buffer = NULL;
+	if (env_args != NULL)
+	{
+		freedom(2, env_args);
+	}
+	freedom(2, args);
+}
+
+/**
+* freedom - free the memory double or simple pointer
+* @n: 1 is Pointer, 2 is double pointer
+* Return: nothing
+*/
+
+void freedom(int n, ...)
+{
 	int i = 0;
+	char **ptr2 = NULL;
+	char *ptr1 = NULL;
+	va_list arg;
 
-	readcount = getline(&buffer, &n, stdin);
-	if (readcount == -1)
+	va_start(arg, n);
+
+	if (n == 1)
 	{
-		free(buffer);
-		if (isatty(STDIN_FILENO) != 0)
-			write(STDOUT_FILENO, "\n", 1);
-		exit(0);
+		ptr1 = va_arg(arg, char *);
+		free(ptr1);
 	}
-	if (buffer[readcount - 1] == '\n' || buffer[readcount - 1] == '\t')
-		buffer[readcount - 1] = '\0';
-	for (i = 0; buffer[i]; i++)
+
+	if (n == 2)
 	{
-		if (buffer[i] == '#' && buffer[i - 1] == ' ')
+		ptr2 = va_arg(arg, char **);
+		while (ptr2[i] != NULL)
 		{
-			buffer[i] = '\0';
-			break;
+			free(ptr2[i]);
+			i++;
 		}
+		free(ptr2);
 	}
-	return (buffer);
 }
 
 /**
- * _strtoken - creates array of tokens based on user string
- * @buffer: pointer to user string
- *
- * Return: pointer to array of user strings
- */
-char **_strtoken(char *buffer)
-{
-	char *token;
-	int i = 0, wordcount = 0;
-	char *delimiter = " \n";
-	char **av;
+* free_all - frees tokenized PATH directories and user's arguments
+* @dptr1: first double pointer to free
+* @dptr2: second double pointer to free
+* @sptr1: first single pointer to free
+* @sptr2: second double pointer to free
+* Return: nothing
+*/
 
-	wordcount = _splitstring(buffer);
-	if (!wordcount)
-		return (NULL);
-	av = malloc((wordcount + 1) * sizeof(char *));
-	if (av == NULL)
-		exit(1);
-	token = strtok(buffer, delimiter);
-	while (token != NULL)
+void free_all(char **dptr1, char **dptr2, char *sptr1, char *sptr2)
+{
+
+	if (dptr1 != NULL)
 	{
-		av[i] = _strdup(token);
-		token = strtok(NULL, delimiter);
-		i++;
+		freedom(2, dptr1);
+		dptr1 = NULL;
 	}
-	av[i] = NULL;
-	return (av);
-}
-
-/**
- * _concat - concats user string with PATH member string and /
- * @tmp: static array to store concatenated string
- * @av: pointer to array of user strings
- * @tok: pointer to PATH token
- *
- * Return: 0 on success
- */
-char *_concat(char *tmp, char **av, char *tok)
-{
-	int len = 0;
-
-	_memset(tmp, 0, 256);
-	len = _strlen(tok) + _strlen(av[0]) + 2;
-	_strcat(tmp, tok);
-	_strcat(tmp, "/");
-	_strcat(tmp, av[0]);
-	tmp[len - 1] = '\0';
-	return (tmp);
+	if (dptr2 != NULL)
+	{
+		freedom(2, dptr2);
+		dptr2 = NULL;
+	}
+	if (sptr1 != NULL)
+	{
+		free(sptr1);
+		sptr1 = NULL;
+	}
+	if (sptr2 != NULL)
+	{
+		free(sptr2);
+		sptr2 = NULL;
+	}
 }
