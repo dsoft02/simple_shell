@@ -21,7 +21,7 @@ int main(void)
 	signal(SIGINT, SIG_IGN);
 	PATH = _getenv("PATH");
 	if (PATH == NULL)
-		return (-1);
+		return (EXIT_FAILURE);
 	while (1)
 	{
 		argv = NULL;
@@ -44,5 +44,5 @@ int main(void)
 			free(buffer);
 	}
 
-	return (0);
+	return (EXIT_SUCCESS);
 }
