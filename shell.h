@@ -26,6 +26,9 @@ char *_read(void);
 /* basic functions */
 int _putchar(char c);
 void _puts(char *str);
+char *_memset(char *s, char b, unsigned int n);
+char *_getenv(const char *name);
+int _env(void);
 
 
 /* string functions */
