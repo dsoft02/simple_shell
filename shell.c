@@ -17,7 +17,7 @@ int main(void)
 	char **argv;
 	int exitstatus = 0;
 
-	init_shell();
+	/* init_shell(); */
 	signal(SIGINT, SIG_IGN);
 	PATH = _getenv("PATH");
 	if (PATH == NULL)
