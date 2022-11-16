@@ -24,7 +24,7 @@ int prompt(void)
 	char *prompt = "$ ";
 	ssize_t linecount = 0;
 
-	if (isatty(STDIN_FILENO) == 1)
+	if (isatty(STDIN_FILENO))
 	{
 		linecount = write(STDOUT_FILENO, prompt, 2);
 		if (linecount == -1)

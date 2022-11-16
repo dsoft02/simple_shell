@@ -5,14 +5,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <dirent.h>
 #include <signal.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <string.h>
 #include <sys/time.h>
-#include <sys/resource.h>
 
 extern char **environ;
 
@@ -21,6 +19,12 @@ extern char **environ;
 void init_shell(void);
 int prompt(void);
 char *_read(void);
+
+/* program logic */
+
+int checkbuiltins(char **av, char *buffer, int exitstatus);
+int _forkprocess(char **av, char *buffer, char *pathbuffer);
+char **_strtoken(char *buffer);
 
 
 /* basic functions */
@@ -45,10 +49,6 @@ int _splitPath(char *str);
 int _strcmpPath(const char *s1, const char *s2);
 char *_concat(char *tmp, char **av, char *tok);
 
-/* program logic */
 
-int checkbuiltins(char **av, char *buffer, int exitstatus);
-int _forkprocess(char **av, char *buffer, char *pathbuffer);
-char **_strtoken(char *buffer);
 
 #endif
