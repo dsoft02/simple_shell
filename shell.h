@@ -36,10 +36,15 @@ int _countstring(char *str);
 char *_strdup(char *str);
 int _splitstring(char *str);
 
+/* Path functions */
 char *_pathbuffer(char **av, char *PATH, char *copy);
+int _splitPath(char *str);
+int _strcmpPath(const char *s1, const char *s2);
+char *_concat(char *tmp, char **av, char *tok);
+
+/* program logic */
+
 int checkbuiltins(char **av, char *buffer, int exitstatus);
 int _forkprocess(char **av, char *buffer, char *pathbuffer);
-
-
 
 #endif

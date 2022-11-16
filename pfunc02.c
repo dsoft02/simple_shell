@@ -48,6 +48,55 @@ char *_pathbuffer(char **av, char *PATH, char *copy)
 	free(copy);
 	return (pathbuffer);
 }
+
+/**
+ * _splitPath - counts the number of PATH members
+ * @str: pointer to string to count
+ *
+ * Return: number of PATH members
+ */
+int _splitPath(char *str)
+{
+	int i;
+	int searchflag = 1;
+	int wordcount = 0;
+
+	for (i = 0; str[i]; i++)
+	{
+		if (str[i] != ':' && searchflag == 1)
+		{
+			wordcount += 1;
+			searchflag = 0;
+		}
+		if (str[i + 1] == ':')
+		{
+			searchflag = 1;
+		}
+	}
+	return (wordcount);
+}
+
+#include "shell.h"
+
+/**
+ * _strcmpPath - compares PATH with environ to find PATH value
+ * @s1: pointer PATH string
+ * @s2: pointer to environ string with actual value
+ *
+ * Return: 0 on success
+ */
+int _strcmpPath(const char *s1, const char *s2)
+{
+	int i;
+
+	for (i = 0; s2[i] != '='; i++)
+	{
+		if (s1[i] != s2[i])
+			return (-1);
+	}
+	return (0);
+}
+
 /**
  * checkbuiltins - check if first user string is a built-in
  * @av: pointer to array of user of strings
@@ -79,6 +128,7 @@ int checkbuiltins(char **av, char *buffer, int exitstatus)
 	else
 		return (0);
 }
+
 /**
  * _forkprocess - create child process to execute based on user input
  * @av: pointer to array of user of strings

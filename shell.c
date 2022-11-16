@@ -19,9 +19,12 @@ int main(void)
 
 	init_shell();
 	signal(SIGINT, SIG_IGN);
+	
 	while (1)
 	{
+		argv = NULL;
 		prompt();
+		buffer = _read();
 	}
 
 	return (0);
